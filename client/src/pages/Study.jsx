@@ -123,7 +123,9 @@ export default function Study() {
           {staff && tab === 'findings' && (
             s.prediction ? (<>
               <Ladder scores={s.prediction.scores} selected={sel} onSelect={setSel} />
-              <p className="small faint" style={{ padding: '0 14px 14px' }}>The model uses a softmax output, so the 14 scores sum to 100% and rank findings against each other. They are not independent probabilities.</p>
+              <p className="small faint" style={{ padding: '0 14px 14px' }}>
+                TorchXRayVision DenseNet-121 outputs independent multi-label probabilities calibrated against dataset operating thresholds (op_threshs). Amber markers indicate sensitivity operating points; scores are decision-support estimates and require clinical physician correlation.
+              </p>
             </>) : (
               <div className="bd stack"><p className="muted">This study has not been analysed yet.</p><div><button className="btn primary" disabled={busy} onClick={analyse}>{busy ? 'Analysing…' : 'Analyse now'}</button></div></div>)
           )}
@@ -201,11 +203,14 @@ function Review({ s, staff, locked, user, onSaved }) {
       {locked && <p className="ok">Signed off by {r.doctor_name} on {fdate(r.finalized_at)}. This report is locked.</p>}
       <ErrorBox error={err} />{ok && <p className="ok" role="status">{ok}</p>}
       <div>
-        <h3>Model findings above threshold</h3>
-        {primary.length === 0 ? <p className="muted small" style={{ marginTop: 6 }}>Nothing exceeded its threshold. Add any finding you see below.</p> :
+        <h3>Model findings above operating threshold</h3>
+        {primary.length === 0 ? <p className="muted small" style={{ marginTop: 6 }}>No findings exceed their operating threshold. Add any findings observed during review below.</p> :
           primary.map((f) => (
             <div className="verdict" key={f.disease}>
-              <div><b>{label(f.disease)}</b> <span className="muted small">{f.score_pct.toFixed(1)}%</span></div>
+              <div>
+                <b>{label(f.disease)}</b> <span className="muted small">{f.score_pct.toFixed(1)}% (op threshold {f.threshold_pct}%)</span>
+                {f.status && <div className="faint small" style={{ fontSize: 11, color: 'var(--amber)' }}>{f.status}</div>}
+              </div>
               <div className="seg" role="group" aria-label={`Verdict for ${label(f.disease)}`}>
                 {[['confirm', 'Confirm'], ['reject', 'Reject'], ['none', 'Unsure']].map(([v, t]) => <button key={v} data-v={v} disabled={locked} aria-pressed={verdict[f.disease] === v} onClick={() => setVerdict({ ...verdict, [f.disease]: v })}>{t}</button>)}
               </div>

@@ -626,7 +626,14 @@ app.post('/api/assistant', auth, roles('DOCTOR', 'ADMIN'), (req, res) => {
 app.get('/api/performance', auth, (_req, res) => res.json({
   images: [{ file: 'deep_trained_model.png', title: 'Deep model: ROC curves per finding' }, { file: 'quick_trained_model.png', title: 'Quick baseline: ROC curves per finding' }]
     .filter((i) => fs.existsSync(path.join(ROOT, 'results', i.file))),
-  architecture: [['Input', '128 × 128 × 1 grayscale, scaled 0-1'], ['Conv blocks', '5 (8 → 16 → 32 → 64 → 128 filters), 3×3, ReLU'], ['Regularisation', 'MaxPool + Dropout 0.2'], ['Head', 'Dense 500 → Dropout 0.2 → Dense 14 (softmax)'], ['Loss / optimiser', 'Categorical cross-entropy / Adam'], ['Grad-CAM layer', 'conv2d_5']],
+  architecture: [
+    ['Architecture', 'DenseNet-121 (TorchXRayVision densenet121-res224-all)'],
+    ['Input Dimensions', '224 × 224 × 1 grayscale, normalized [-1024, 1024]'],
+    ['Feature Backbone', 'DenseBlocks 1-4 with Transition Layers and BatchNorm'],
+    ['Output Head', 'Multi-label Independent Sigmoid (14 NIH findings + 4 multi-dataset heads)'],
+    ['Decision Bounds', 'Per-pathology operating thresholds (op_threshs)'],
+    ['Grad-CAM Target', 'features.denseblock4 (pre-sigmoid logit attribution)']
+  ],
 }));
 app.use('/results', express.static(path.join(ROOT, 'results')));
 

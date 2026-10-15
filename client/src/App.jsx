@@ -14,9 +14,9 @@ import Model from './pages/Model';
 import Admin from './pages/Admin';
 
 const NAV = {
-  DOCTOR: [['/', 'Worklist'], ['/hero', '✨ 3D Hero'], ['/new', 'New study'], ['/patients', 'Patients'], ['/compare', 'Compare'], ['/appointments', 'Appointments'], ['/assistant', 'Assistant'], ['/doctors', 'Doctors'], ['/model', 'Model & data']],
-  ADMIN: [['/', 'Worklist'], ['/hero', '✨ 3D Hero'], ['/new', 'New study'], ['/patients', 'Patients'], ['/compare', 'Compare'], ['/appointments', 'Appointments'], ['/assistant', 'Assistant'], ['/doctors', 'Doctors'], ['/model', 'Model & data'], ['/admin', 'Administration']],
-  PATIENT: [['/', 'My results'], ['/hero', '✨ 3D Hero'], ['/appointments', 'Appointments'], ['/doctors', 'Doctors'], ['/model', 'About the data']],
+  DOCTOR: [['/', 'Worklist'], ['/new', 'New study'], ['/patients', 'Patients'], ['/compare', 'Compare'], ['/appointments', 'Appointments'], ['/assistant', 'Assistant'], ['/doctors', 'Doctors'], ['/model', 'Model & data']],
+  ADMIN: [['/', 'Worklist'], ['/new', 'New study'], ['/patients', 'Patients'], ['/compare', 'Compare'], ['/appointments', 'Appointments'], ['/assistant', 'Assistant'], ['/doctors', 'Doctors'], ['/model', 'Model & data'], ['/admin', 'Administration']],
+  PATIENT: [['/', 'My results'], ['/appointments', 'Appointments'], ['/doctors', 'Doctors'], ['/model', 'About the data']],
 };
 
 export default function App() {

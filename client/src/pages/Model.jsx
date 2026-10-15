@@ -11,12 +11,12 @@ export default function Model() {
       <ErrorBox error={error} />
       <div className="stack" style={{ maxWidth: 980 }}>
         <section className="panel">
-          <div className="hd"><h2>Limits to keep in mind</h2></div>
+          <div className="hd"><h2>Model Architecture & Decision Support Guidelines</h2></div>
           <div className="bd stack" style={{ maxWidth: '72ch' }}>
-            <p>This is a small baseline CNN trained on 128 × 128 images from the NIH Chest X-ray dataset. It is a teaching and research tool.</p>
-            <p>Its output layer is a softmax, so the 14 scores always add up to 100% and compete with each other. A high score means "ranked above the other findings", not "probably present". The reporting thresholds are tuned for sensitivity and will flag many normal films.</p>
-            <p>NIH labels were mined from radiology reports by text analysis, so some labels are wrong. Grad-CAM shows where the model looked, which is not proof of disease.</p>
-            <p className="faint small">Measured per-finding accuracy (AUC, sensitivity, specificity) has not been computed on a held-out test set for this build, so none is shown. Run the evaluation in the notebook before quoting numbers.</p>
+            <p>Chest-X AI v2 incorporates the pretrained TorchXRayVision DenseNet-121 (<code>densenet121-res224-all</code>) multi-dataset model. Radiographs are normalized to 224 × 224 in [-1024, 1024] range with aspect-ratio-preserving center crops.</p>
+            <p>The model outputs independent multi-label Sigmoid probabilities across 14 canonical NIH findings (plus 4 multi-dataset heads). Findings are ranked by their score relative to empirical operating thresholds (<code>op_threshs</code>) calibrated on hospital datasets.</p>
+            <p>Operating thresholds are sensitivity decision-support operating points, not proof of pathology. Scores exceeding operating thresholds indicate findings warranting clinical review by a licensed radiologist.</p>
+            <p className="faint small">Grad-CAM provides feature attribution heatmaps on <code>denseblock4</code> to highlight regions driving model score elevation. Grad-CAM visualizes network attention and does not constitute diagnostic proof.</p>
           </div>
         </section>
         {data.images.length > 0 && (

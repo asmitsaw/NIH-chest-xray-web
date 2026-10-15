@@ -51,9 +51,9 @@ export function Ladder({ scores, selected, onSelect }) {
         ))}
       </div>
       <div className="legend">
-        <span><i style={{ width: 14, height: 8, background: 'var(--ink)' }} />Above threshold</span>
-        <span><i style={{ width: 14, height: 8, background: '#aab4c3' }} />Below threshold</span>
-        <span><i style={{ width: 2, height: 12, background: 'var(--amber)' }} />Reporting threshold</span>
+        <span><i style={{ width: 14, height: 8, background: 'var(--ink)' }} />Above operating threshold</span>
+        <span><i style={{ width: 14, height: 8, background: '#aab4c3' }} />Below operating threshold</span>
+        <span><i style={{ width: 2, height: 12, background: 'var(--amber)' }} />Sensitivity operating point (op_thresh)</span>
       </div>
     </div>
   );

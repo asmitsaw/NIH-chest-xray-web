@@ -127,6 +127,95 @@ class TestChestXRayML(unittest.TestCase):
             self.assertGreater(threshs[disease], 0.0, f"Threshold for {disease} must be positive")
             self.assertLess(threshs[disease], 1.0, f"Threshold for {disease} must be < 1.0")
 
+    def test_10_no_double_sigmoid(self):
+        """Verify forward pass returns raw logits and adapter applies exactly one sigmoid (not double sigmoid)."""
+        tensor, _ = preprocess_xray_image(self.sample_path)
+        adapter = self.predictor.adapter
+        raw_logits = adapter.get_logits(tensor)[0]
+        
+        # Verify raw classifier output is linear logits (can be negative and outside [0, 1])
+        has_negative = np.any(raw_logits < 0)
+        self.assertTrue(has_negative, "Classifier output must be unconstrained linear logits.")
+
+        # Verify adapter predictions match exact 1 / (1 + exp(-logit))
+        preds = adapter.predict(tensor)[0]
+        expected_sigmoids = 1.0 / (1.0 + np.exp(-raw_logits))
+        for disease in DISEASE_CLASSES:
+            idx = adapter.get_pathology_index(disease)
+            target_idx = adapter.class_names.index(disease)
+            np.testing.assert_allclose(
+                preds[target_idx],
+                expected_sigmoids[idx],
+                rtol=1e-4,
+                atol=1e-5,
+                err_msg=f"Prediction for {disease} does not match single sigmoid of raw logit."
+            )
+
+    def test_11_pathology_label_indexing(self):
+        """Confirm that findings are mapped to output heads strictly by label string, not assumed ordinal index."""
+        adapter = self.predictor.adapter
+        self.assertEqual(len(adapter.pathologies), 18)
+        for disease in DISEASE_CLASSES:
+            self.assertIn(disease, adapter.pathologies)
+            # Ensure label index resolves correctly
+            idx = adapter.get_pathology_index(disease)
+            self.assertEqual(adapter.pathologies[idx], disease)
+
+    def test_12_aspect_preserving_crop_and_intensity(self):
+        """Verify anisotropic images preserve aspect ratio via center crop and scale to [-1024, 1024]."""
+        # Create non-square test image (width 400, height 200)
+        rect_img = Image.new("L", (400, 200), color=100)
+        buf = io.BytesIO()
+        rect_img.save(buf, format="PNG")
+        tensor, display = preprocess_xray_image(buf.getvalue())
+        self.assertEqual(tensor.shape, (1, 1, 224, 224))
+        self.assertGreaterEqual(float(np.min(tensor)), -1025.0)
+        self.assertLessEqual(float(np.max(tensor)), 1025.0)
+        self.assertTrue(np.all(np.isfinite(tensor)))
+
+    def test_13_multi_finding_gradcam_logits(self):
+        """Verify Grad-CAM produces distinct, finite heatmaps for multiple pathologies on the same image."""
+        pneu_sample = os.path.join(BASE_DIR, "data", "sample_images", "sample_04_pneumonia_infiltration.png")
+        tensor, display = preprocess_xray_image(pneu_sample)
+        out_infilt = generate_explainability_for_finding(
+            self.predictor.adapter, tensor, display, disease_name="Infiltration"
+        )
+        out_pneumo = generate_explainability_for_finding(
+            self.predictor.adapter, tensor, display, disease_name="Pneumonia"
+        )
+        self.assertTrue(np.all(np.isfinite(out_infilt["raw_heatmap"])))
+        self.assertTrue(np.all(np.isfinite(out_pneumo["raw_heatmap"])))
+        self.assertGreater(out_infilt["raw_heatmap"].max(), 0.0)
+        self.assertGreater(out_pneumo["raw_heatmap"].max(), 0.0)
+        self.assertEqual(out_infilt["heatmap_image"].size, display.size)
+        self.assertEqual(out_pneumo["heatmap_image"].size, display.size)
+        # Verify heatmaps for different findings are not identical
+        diff = np.abs(out_infilt["raw_heatmap"] - out_pneumo["raw_heatmap"]).sum()
+        self.assertGreater(diff, 1e-4, "Grad-CAM heatmaps for Infiltration and Pneumonia should differ.")
+
+    def test_14_postprocessing_status_and_ranking(self):
+        """Verify postprocessing ranks findings by operating-point ratio and assigns non-diagnostic status strings."""
+        from ai.postprocessing import postprocess_predictions
+        mock_preds = [
+            {"disease": "Cardiomegaly", "probability": 0.60},
+            {"disease": "Pneumonia", "probability": 0.35},
+            {"disease": "Effusion", "probability": 0.30},
+        ]
+        mock_threshs = {
+            "Cardiomegaly": 0.40,  # ratio = 1.50 -> Score above operating threshold
+            "Pneumonia": 0.05,     # ratio = 7.00, prob >= 0.15 -> Markedly elevated score
+            "Effusion": 0.35,      # ratio = 0.85 -> Borderline / near threshold
+        }
+        res = postprocess_predictions(mock_preds, thresholds=mock_threshs, rank_by="threshold_ratio")
+        ranked = res["predictions"]
+        # Pneumonia ratio (5.0) > Cardiomegaly ratio (1.5) > Effusion ratio (0.85)
+        self.assertEqual(ranked[0]["disease"], "Pneumonia")
+        self.assertEqual(ranked[0]["status"], "Markedly elevated score")
+        self.assertEqual(ranked[1]["disease"], "Cardiomegaly")
+        self.assertEqual(ranked[1]["status"], "Score above operating threshold")
+        self.assertEqual(ranked[2]["disease"], "Effusion")
+        self.assertEqual(ranked[2]["status"], "Borderline / near threshold")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -62,6 +62,7 @@ class TorchXRayVisionDenseNetAdapter(AbstractModelAdapter):
         self.is_loaded = False
         self.loaded_at = None
         self.pathologies = []
+        self.class_names = list(DISEASE_CLASSES)
         self.class_indices = []
         self.op_thresholds = {}
         self.unsupported_classes = set()
@@ -110,6 +111,23 @@ class TorchXRayVisionDenseNetAdapter(AbstractModelAdapter):
     def get_thresholds(self) -> Dict[str, float]:
         """Returns the official operating thresholds mapped from the model."""
         return dict(self.op_thresholds)
+
+    def get_pathology_index(self, disease: str) -> int:
+        """Returns the index in the model's 18-pathology output head for the given label."""
+        if disease in self.pathologies:
+            return self.pathologies.index(disease)
+        raise ValueError(f"Pathology '{disease}' is not in model pathologies: {self.pathologies}")
+
+    def get_logits(self, input_tensor: np.ndarray) -> np.ndarray:
+        """Returns raw pre-sigmoid linear logits directly from classifier head."""
+        if not self.is_loaded or self.model is None:
+            raise RuntimeError("Model is not loaded. Call load() first.")
+        import torch
+        t = self._prepare_tensor(input_tensor)
+        with torch.no_grad():
+            features = self.model.features2(t)
+            logits = self.model.classifier(features).cpu().numpy()
+        return logits
 
     def _prepare_tensor(self, input_tensor: np.ndarray):
         import torch
