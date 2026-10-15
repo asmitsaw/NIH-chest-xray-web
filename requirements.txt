@@ -1,0 +1,12 @@
+# Inference service dependencies. Web UI + API are Node/React (see package.json files).
+torch>=2.0.0
+torchvision>=0.15.0
+torchxrayvision>=1.5.0
+scikit-image>=0.20.0
+tensorflow>=2.15.0
+h5py>=3.10.0
+numpy>=1.24.0
+pillow>=10.0.0
+opencv-python>=4.8.0
+flask>=3.0.0
+
