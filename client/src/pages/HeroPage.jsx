@@ -74,7 +74,7 @@ export default function HeroPage() {
           <div className="pv-brand" onClick={() => scrollToSection('overview')}>
             <img
               src={BRAND_LOGO_URL}
-              alt="PulmoVision AI Logo"
+              alt="Chest-X Logo"
               style={{ height: 32, width: 'auto', objectFit: 'contain' }}
               onError={(e) => {
                 // Fallback to stylized SVG icon if remote URL blocked
@@ -86,7 +86,7 @@ export default function HeroPage() {
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>pulmonology</span>
             </div>
             <div className="pv-brand-text">
-              <span className="pv-brand-title">PulmoVision AI</span>
+              <span className="pv-brand-title">Chest X</span>
               <span className="pv-brand-subtitle">Intelligent Chest X-ray Analysis</span>
             </div>
           </div>
@@ -567,7 +567,7 @@ export default function HeroPage() {
               CLINICAL WORKFLOW LIFECYCLE
             </span>
             <h2 style={{ fontFamily: 'var(--pv-font-display)', fontSize: 32, fontWeight: 800, marginTop: 8, color: '#0b1c30' }}>
-              How PulmoVision AI Empowers Radiologists
+              How Chest X AI Empowers Radiologists
             </h2>
             <p style={{ fontSize: 15, color: '#3e494a', lineHeight: 1.6, marginTop: 10 }}>
               From initial DICOM upload to finalized signed PDF reports, our workflow preserves clinician oversight at every step.
@@ -621,7 +621,7 @@ export default function HeroPage() {
                   Engineered with Rigorous Academic Standards
                 </h3>
                 <p style={{ fontSize: 14, color: '#3e494a', lineHeight: 1.6, marginTop: 12 }}>
-                  Unlike opaque black-box AI tools, PulmoVision AI integrates open scientific checkpoints, aspect-preserving image transforms, explicit operating-point thresholds, and audited PDF exports.
+                  Unlike opaque black-box AI tools, Chest X- AI integrates open scientific checkpoints, aspect-preserving image transforms, explicit operating-point thresholds, and audited PDF exports.
                 </p>
                 <div style={{ marginTop: 20 }}>
                   <button
@@ -671,7 +671,7 @@ export default function HeroPage() {
               RESEARCH CONTEXT & CITATION
             </span>
             <h3 style={{ fontFamily: 'var(--pv-font-display)', fontSize: 24, fontWeight: 800, marginTop: 8, color: '#0b1c30' }}>
-              Chest-X AI v2 / PulmoVision Decision Support System
+              Chest-X AI v2 / Chest-X AI Decision Support System
             </h3>
             <p style={{ fontSize: 13, color: '#3e494a', lineHeight: 1.6, marginTop: 10 }}>
               Developed as an educational and research decision-support prototype. TorchXRayVision DenseNet-121 weights (Wang et al., IEEE CVPR 2017 & Cohen et al., 2022). Patient data is encrypted and partitioned strictly by medical record number.
@@ -686,12 +686,12 @@ export default function HeroPage() {
           <div className="pv-footer-left">
             <img
               src={BRAND_LOGO_URL}
-              alt="PulmoVision AI Logo"
+              alt="Chest-X AI Logo"
               style={{ height: 24, width: 'auto', objectFit: 'contain' }}
               onError={(e) => { e.target.style.display = 'none'; }}
             />
             <span className="pv-footer-copy">
-              © 2025 PulmoVision AI Inc. Clinical Diagnostic Informatics. All rights reserved.
+              © 2025 Chest-X AI Inc. Clinical Diagnostic Informatics. All rights reserved.
             </span>
           </div>
 
@@ -730,7 +730,7 @@ export default function HeroPage() {
           <div className="pv-modal-box" onClick={(e) => e.stopPropagation()}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #e5eeff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#0b1c30' }}>Sign In to PulmoVision AI</h3>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#0b1c30' }}>Sign In to Chest-X AI</h3>
                 <p style={{ margin: '3px 0 0', fontSize: 12, color: '#3e494a' }}>Select a role or enter your credentials</p>
               </div>
               <button
